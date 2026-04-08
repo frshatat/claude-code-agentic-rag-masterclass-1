@@ -1,60 +1,163 @@
-# Cloud Code Agentic RAG Masterclass
+# Agentic RAG Masterclass App
 
-Build an agentic RAG application from scratch by collaborating with Claude Code. Follow along with our video series using the docs in this repo.
+This repository contains a full-stack RAG chat application built during Module 1 of the Agentic RAG Masterclass.
 
-[![Claude Code RAG Masterclass](./video-thumbnail.png)](https://www.youtube.com/watch?v=xgPWCuqLoek)
-
-[Watch the full video on YouTube](https://www.youtube.com/watch?v=xgPWCuqLoek)
-
-## What This Is
-
-A hands-on course where you collaborate with Claude Code to build a full-featured RAG system. You're not the one writing code—Claude is. Your job is to guide it, understand what you're building, and course-correct when needed.
-
-**You don't need to know how to code.** You do need to be technically minded and willing to learn about APIs, databases, and system architecture.
-
-## What You'll Build
-
-- **Chat interface** with threaded conversations, streaming, tool calls, and subagent reasoning
-- **Document ingestion** with drag-and-drop upload and processing status
-- **Full RAG pipeline**: chunking, embedding, hybrid search, reranking
-- **Agentic patterns**: text-to-SQL, web search, subagents with isolated context
+Current implementation includes:
+- FastAPI backend with auth-protected thread and message routes
+- React + Vite frontend with Supabase auth flow and protected routes
+- Supabase-backed threads and messages schema with Row-Level Security policies
+- Azure OpenAI integration with streaming responses over SSE
+- LangSmith tracing hooks in the backend OpenAI service
+- Playwright-based end-to-end smoke validation script
 
 ## Tech Stack
 
 | Layer | Tech |
-|-------|------|
-| Frontend | React, TypeScript, Tailwind, shadcn/ui, Vite |
-| Backend | Python, FastAPI |
-| Database | Supabase (Postgres + pgvector + Auth + Storage) |
-| Doc Processing | Docling |
-| AI Models | Local (LM Studio) or Cloud (OpenAI, OpenRouter) |
+|---|---|
+| Frontend | React, TypeScript, Vite, Tailwind, shadcn/ui |
+| Backend | Python, FastAPI, Uvicorn |
+| Database/Auth | Supabase |
+| LLM | Azure OpenAI |
 | Observability | LangSmith |
+| E2E Testing | Playwright |
 
-## The 8 Modules
+## Project Structure
 
-1. **App Shell** — Auth, chat UI, managed RAG with OpenAI Responses API
-2. **BYO Retrieval + Memory** — Ingestion, pgvector, switch to generic completions API
-3. **Record Manager** — Content hashing, deduplication
-4. **Metadata Extraction** — LLM-extracted metadata, filtered retrieval
-5. **Multi-Format Support** — PDF, DOCX, HTML, Markdown via Docling
-6. **Hybrid Search & Reranking** — Keyword + vector search, RRF, reranking
-7. **Additional Tools** — Text-to-SQL, web search fallback
-8. **Subagents** — Isolated context, document analysis delegation
+```
+backend/
+	app/
+		auth/
+		db/
+		models/
+		routers/
+		services/
+frontend/
+	src/
+		components/
+		contexts/
+		lib/
+		pages/
+supabase/
+	migrations/
+e2e/
+```
 
-## Getting Started
+## Prerequisites
 
-1. Clone this repo
-2. Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-3. Open in your IDE (Cursor, VS Code, etc.)
-4. Run `claude` in the terminal
-5. Use the `/onboard` command to get started
+- Python 3.11+
+- Node.js 20+
+- npm
+- Supabase project
+- Azure OpenAI deployment
+- LangSmith project (optional but recommended)
 
-## Docs
+## Environment Configuration
 
-- [PRD.md](./PRD.md) — What to build (the 8 modules in detail)
-- [CLAUDE.md](./CLAUDE.md) — Context for Claude Code
-- [PROGRESS.md](./PROGRESS.md) — Track your build progress
+Use `.env.example` as your reference. This project expects:
 
-## Join the Community
+- Backend env file: `backend/.env`
+- Frontend env file: `frontend/.env`
 
-If you want to connect with hundreds of builders creating production-grade AI and RAG systems, join us in [The AI Automators community](https://www.theaiautomators.com/). Share your progress, get help when you're stuck, and see what others are building.
+Required variables:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY`
+- `AZURE_OPENAI_DEPLOYMENT_NAME`
+- `LANGCHAIN_API_KEY` (optional if tracing disabled)
+- `LANGCHAIN_PROJECT`
+- `LANGCHAIN_TRACING_V2`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_API_URL`
+
+## Setup
+
+### 1) Backend
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2) Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+### 3) Supabase SQL migrations
+
+Apply the files in:
+- `supabase/migrations/001_create_threads.sql`
+- `supabase/migrations/002_create_messages.sql`
+
+## Run Locally
+
+Start backend:
+
+```bash
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload
+```
+
+Start frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+App URLs:
+- Frontend: http://localhost:5173
+- Backend: http://127.0.0.1:8000
+- Backend health: http://127.0.0.1:8000/health
+
+## Validation and Testing
+
+### Frontend static checks
+
+```bash
+cd frontend
+npm run build
+npm run lint
+```
+
+### End-to-end smoke test
+
+```bash
+node e2e/module1.mjs
+```
+
+The smoke test validates:
+- unauthenticated redirect to `/login`
+- login page render
+- protected route guard behavior
+- callback page mount
+- backend health endpoint response
+- unauthenticated API access rejection
+
+## Playwright MCP (VS Code)
+
+This repo includes VS Code MCP server config at `.vscode/mcp.json`:
+- server name: `playwright`
+- command: `playwright-mcp`
+- browser: `chromium`
+
+Install globally:
+
+```bash
+npm install -g @playwright/mcp
+$(npm root -g)/@playwright/mcp/node_modules/.bin/playwright install chromium
+```
+
+## Useful Docs
+
+- `PRD.md` for module requirements
+- `CLAUDE.md` for project rules and architecture constraints
+- `PROGRESS.md` for implementation and validation status

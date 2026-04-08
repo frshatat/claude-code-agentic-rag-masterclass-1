@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "playwright-mcp",
+      "args": ["--browser", "chromium"]
+    }
+  }
+}

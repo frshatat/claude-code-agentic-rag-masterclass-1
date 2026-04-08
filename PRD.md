@@ -53,13 +53,13 @@ Technically-minded people who want to build production RAG systems using AI codi
 | Frontend | React + TypeScript + Vite + Tailwind + shadcn/ui |
 | Backend | Python + FastAPI |
 | Database | Supabase (Postgres + pgvector + Auth + Storage + Realtime) |
-| LLM (Module 1) | OpenAI Responses API (managed threads + file_search) |
-| LLM (Module 2+) | Any OpenAI-compatible endpoint (OpenRouter, Ollama, LM Studio, etc.) |
+| LLM (Module 1) | Azure OpenAI Responses API (managed threads + file_search) |
+| LLM (Module 2+) | Any Azure OpenAI-compatible endpoint (OpenRouter, Ollama, LM Studio, etc.) |
 | Observability | LangSmith |
 
 ## Constraints
 
-- No LLM frameworks - raw OpenAI SDK using the standard Chat Completions API (OpenAI-compatible), Pydantic for structured outputs
+- No LLM frameworks - raw Azure OpenAI SDK using the standard Chat Completions API (Azure OpenAI-compatible), Pydantic for structured outputs
 - Row-Level Security on all tables - users only see their own data
 - Streaming chat via SSE
 - Ingestion status via Supabase Realtime
@@ -68,28 +68,28 @@ Technically-minded people who want to build production RAG systems using AI codi
 
 ## Module 1: The App Shell + Observability
 
-**Build:** Auth, chat UI, OpenAI Responses API (manages threads + file_search), LangSmith tracing
+**Build:** Auth, chat UI, Azure OpenAI Responses API (manages threads + file_search), LangSmith tracing
 
-**Learn:** What RAG is, why managed RAG exists, its limitations (OpenAI handles memory and retrieval - black box)
+**Learn:** What RAG is, why managed RAG exists, its limitations (Azure OpenAI handles memory and retrieval - black box)
 
-**Note:** The Responses API is OpenAI-specific. It provides managed threads and built-in file search, but locks you into OpenAI. Module 2 transitions to the standard Chat Completions API for provider flexibility.
+**Note:** The Responses API is Azure OpenAI-specific. It provides managed threads and built-in file search, but locks you into Azure OpenAI. Module 2 transitions to the standard Chat Completions API for provider flexibility.
 
 ---
 
 ## Architectural Decision: Module 1 → Module 2 Transition
 
-At the end of Module 1, you have a working chat app using OpenAI's **Responses API**—a managed solution where OpenAI handles threads, memory, and file search. In Module 2, you switch to the standard **Chat Completions API** to support any OpenAI-compatible provider (OpenRouter, Ollama, LM Studio, etc.).
+At the end of Module 1, you have a working chat app using Azure OpenAI's **Responses API**—a managed solution where Azure OpenAI handles threads, memory, and file search. In Module 2, you switch to the standard **Chat Completions API** to support any Azure OpenAI-compatible provider (OpenRouter, Ollama, LM Studio, etc.).
 
 **The decision you need to make:** What do you do with the Responses API code? Here are two common approaches, but you're not limited to these—come up with your own if it makes sense for your use case.
 
 | Option | Approach | Pros | Cons |
 |--------|----------|------|------|
-| **A: Replace** | Remove Responses API code entirely, rebuild on Chat Completions | Clean codebase, single pattern, easier to maintain | Lose the ability to use OpenAI's managed RAG |
+| **A: Replace** | Remove Responses API code entirely, rebuild on Chat Completions | Clean codebase, single pattern, easier to maintain | Lose the ability to use Azure OpenAI's managed RAG |
 | **B: Dual Support** | Keep Responses API alongside Chat Completions, configurable per request | Flexibility to use either approach, compare them side-by-side | More complex codebase, two patterns to understand |
 
 There is no right answer—this is a real architectural choice you'll face in building production systems.
 
-**In the video, I chose Option A**—completely removing the Responses API code from the codebase and any related schema from the database. This keeps things simple and focused on the OpenAI-compatible Chat Completions pattern going forward.
+**In the video, I chose Option A**—completely removing the Responses API code from the codebase and any related schema from the database. This keeps things simple and focused on the Azure OpenAI-compatible Chat Completions pattern going forward.
 
 **This is a lesson in steering Claude Code**: you need to clearly communicate your decision and guide the AI to implement it correctly. Be explicit about what you want removed, refactored, or kept.
 
