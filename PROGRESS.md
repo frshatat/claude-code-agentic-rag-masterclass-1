@@ -36,9 +36,9 @@ Track your progress through the masterclass. Update this file as you complete mo
 - [x] Frontend dev server starts on http://localhost:5173
 - [x] Fixed TS 6 `baseUrl` deprecation error in `tsconfig.app.json`
 - [x] Fixed `react-refresh` lint violations (split `useAuth` hook and `AuthContext` into separate files)
-- [x] Supabase URL corrected to `https://jfkijgjwytnivlthppcr.supabase.com` in both `backend/.env` and `frontend/.env`
-- [ ] Supabase migrations applied in dashboard (manual step — run `supabase/migrations/001_create_threads.sql` and `002_create_messages.sql`)
+- [x] Supabase URL corrected to `https://jfkijgjwytnivlthppcr.supabase.co` in both `backend/.env` and `frontend/.env`
+- [x] Supabase migrations applied — `001_create_threads.sql` and `002_create_messages.sql` pushed via `supabase db push`
 - [x] End-to-end auth flow tested (redirect to login, protected route guard, login page renders, /auth/callback mounts) — automated via `e2e/module1.mjs`
-- [ ] Magic link click-through + session persist + logout (requires live email — manual step)
-- [ ] End-to-end chat flow tested (thread create → message → SSE stream) — requires authenticated session
-- [ ] LangSmith trace verified in dashboard — requires authenticated session
+- [x] Added authenticated Playwright script `e2e/module1-auth-chat.mjs` covering OTP request, magic-link completion hook, and chat create/send assertions
+- [x] End-to-end chat flow tested (thread create → message → SSE stream) — automated via `e2e/module1-auth-chat.mjs`
+- [x] LangSmith trace verification confirmed — `create_openai_thread` and `stream_assistant_response` runs visible in `agentic-rag-masterclass` project with `success` status

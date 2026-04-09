@@ -36,5 +36,35 @@ RAG app with chat (default) and document ingestion interfaces. Config via env va
 3. **Validate** - Test and verify the implementation works correctly. Use browser testing where applicable via an appropriate MCP
 4. **Iterate** - Fix any issues found during validation
 
+## Service Spin-Up (For Future Agents)
+- Start both backend and frontend from repo root with:
+  - `scripts/start-services.sh start`
+- Check service state with:
+  - `scripts/start-services.sh status`
+- Restart cleanly with:
+  - `scripts/start-services.sh restart`
+- Stop both services with:
+  - `scripts/start-services.sh stop`
+- View recent logs with:
+  - `scripts/start-services.sh logs`
+
+### Agent Guidance
+- Always run service commands from repository root.
+- Do not manually run separate long-lived `uvicorn` and `npm run dev` commands unless debugging startup issues.
+- The startup script enforces expected ports and health checks:
+  - Backend health: `http://127.0.0.1:8000/health`
+  - Frontend dev server: `http://localhost:5173`
+
+## Test Credentials
+The following account exists in the Supabase project for automated E2E testing:
+
+- **Email:** test@test.com
+- **Password:** $1MhDupRhDqzqGY
+
+Use these with the password sign-in flow (not magic link). Pass them via env vars when running e2e scripts:
+```bash
+TEST_EMAIL="test@test.com" TEST_PASSWORD='$1MhDupRhDqzqGY' node e2e/module1-auth-chat.mjs
+```
+
 ## Progress
 Check PROGRESS.md for current module status. Update it as you complete tasks.

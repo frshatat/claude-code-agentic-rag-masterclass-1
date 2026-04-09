@@ -14,3 +14,9 @@ def get_supabase() -> Client:
 
 def get_supabase_admin() -> Client:
     return create_client(settings.supabase_url, settings.supabase_service_role_key)
+
+
+def get_supabase_for_token(access_token: str) -> Client:
+    client = create_client(settings.supabase_url, settings.supabase_anon_key)
+    client.postgrest.auth(access_token)
+    return client

@@ -1,5 +1,6 @@
 import asyncio
 import os
+from urllib.parse import urlsplit, urlunsplit
 
 from langsmith import traceable
 from openai import AsyncAzureOpenAI
@@ -15,13 +16,25 @@ _openai_client: AsyncAzureOpenAI | None = None
 ASSISTANT_ID_KEY = "OPENAI_ASSISTANT_ID"
 
 
+def normalize_azure_endpoint(endpoint: str) -> str:
+    raw = endpoint.strip()
+    if not raw:
+        raise ValueError("AZURE_OPENAI_ENDPOINT is required")
+
+    parsed = urlsplit(raw)
+    if not parsed.scheme or not parsed.netloc:
+        raise ValueError("AZURE_OPENAI_ENDPOINT must be a valid absolute URL")
+
+    return urlunsplit((parsed.scheme, parsed.netloc, "", "", "")).rstrip("/")
+
+
 def get_openai_client() -> AsyncAzureOpenAI:
     global _openai_client
     if _openai_client is None:
         _openai_client = AsyncAzureOpenAI(
             api_key=settings.azure_openai_api_key,
-            api_version="2024-08-01-preview",
-            azure_endpoint=settings.azure_openai_endpoint,
+            api_version=settings.azure_openai_api_version,
+            azure_endpoint=normalize_azure_endpoint(settings.azure_openai_endpoint),
         )
     return _openai_client
 

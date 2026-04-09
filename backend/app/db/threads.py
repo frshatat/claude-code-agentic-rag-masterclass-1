@@ -1,10 +1,10 @@
 from supabase import Client
 
-from app.db.supabase import get_supabase_admin
+from app.db.supabase import get_supabase_for_token
 
 
-def get_threads(user_id: str) -> list[dict]:
-    client: Client = get_supabase_admin()
+def get_threads(user_id: str, access_token: str) -> list[dict]:
+    client: Client = get_supabase_for_token(access_token)
     response = (
         client.table("threads")
         .select("*")
@@ -15,8 +15,8 @@ def get_threads(user_id: str) -> list[dict]:
     return response.data
 
 
-def get_thread(thread_id: str, user_id: str) -> dict | None:
-    client: Client = get_supabase_admin()
+def get_thread(thread_id: str, user_id: str, access_token: str) -> dict | None:
+    client: Client = get_supabase_for_token(access_token)
     response = (
         client.table("threads")
         .select("*, messages(*)")
@@ -28,8 +28,13 @@ def get_thread(thread_id: str, user_id: str) -> dict | None:
     return response.data
 
 
-def create_thread(user_id: str, openai_thread_id: str, title: str | None) -> dict:
-    client: Client = get_supabase_admin()
+def create_thread(
+    user_id: str,
+    access_token: str,
+    openai_thread_id: str,
+    title: str | None,
+) -> dict:
+    client: Client = get_supabase_for_token(access_token)
     response = (
         client.table("threads")
         .insert(
@@ -44,18 +49,19 @@ def create_thread(user_id: str, openai_thread_id: str, title: str | None) -> dic
     return response.data[0]
 
 
-def delete_thread(thread_id: str, user_id: str) -> None:
-    client: Client = get_supabase_admin()
+def delete_thread(thread_id: str, user_id: str, access_token: str) -> None:
+    client: Client = get_supabase_for_token(access_token)
     client.table("threads").delete().eq("id", thread_id).eq("user_id", user_id).execute()
 
 
 def add_message(
+    access_token: str,
     thread_id: str,
     role: str,
     content: str,
     openai_message_id: str | None = None,
 ) -> dict:
-    client: Client = get_supabase_admin()
+    client: Client = get_supabase_for_token(access_token)
     response = (
         client.table("messages")
         .insert(

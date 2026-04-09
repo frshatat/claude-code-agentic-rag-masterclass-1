@@ -45,3 +45,12 @@ test-results/
 
 # Local agent artifacts
 .agent/
+
+# Local runtime artifacts
+.run/
+
+# Supabase temp files (project-specific cached metadata)
+supabase/.temp/
+
+# Playwright MCP session artifacts
+.playwright-mcp/

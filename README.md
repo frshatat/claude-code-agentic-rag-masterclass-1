@@ -47,6 +47,7 @@ e2e/
 - Python 3.11+
 - Node.js 20+
 - npm
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (`brew install supabase/tap/supabase` or download binary from [GitHub releases](https://github.com/supabase/cli/releases))
 - Supabase project
 - Azure OpenAI deployment
 - LangSmith project (optional but recommended)
@@ -92,7 +93,15 @@ npm install
 
 ### 3) Supabase SQL migrations
 
-Apply the files in:
+Apply migrations using the Supabase CLI:
+
+```bash
+supabase login
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
+
+Or apply manually via the Supabase SQL editor:
 - `supabase/migrations/001_create_threads.sql`
 - `supabase/migrations/002_create_messages.sql`
 
