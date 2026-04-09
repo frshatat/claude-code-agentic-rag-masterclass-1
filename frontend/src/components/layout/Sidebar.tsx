@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { createThread, deleteThread, getThreads } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { DocumentUpload } from '@/components/chat/DocumentUpload'
 import Header from './Header'
 
 interface Thread {
@@ -50,6 +51,13 @@ export default function Sidebar({
           <Plus className="h-4 w-4" /> New chat
         </Button>
       </div>
+      
+      {/* Document Upload Section */}
+      <div className="px-2">
+        <DocumentUpload />
+      </div>
+      
+      {/* Threads List */}
       <nav className="flex-1 overflow-y-auto p-2 space-y-1">
         {threads.map((t) => (
           <div

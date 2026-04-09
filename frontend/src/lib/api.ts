@@ -1,9 +1,8 @@
 const API_URL = import.meta.env.VITE_API_URL ?? ''
 
 async function authHeaders(): Promise<Record<string, string>> {
-  const { supabase } = await import('./supabase')
-  const { data } = await supabase.auth.getSession()
-  const token = data.session?.access_token
+  const { getAccessToken } = await import('./supabase')
+  const token = getAccessToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 

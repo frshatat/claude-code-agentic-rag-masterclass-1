@@ -6,11 +6,10 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_anon_key: str
     supabase_service_role_key: str
-    azure_openai_endpoint: str
-    azure_openai_api_key: str
-    azure_openai_deployment_name: str = "gpt-4o-mini"
-    azure_openai_api_version: str = "2024-08-01-preview"
-    openai_vector_store_id: str = ""
+    llm_provider: str = "openrouter"
+    llm_api_endpoint: str
+    llm_api_key: str
+    llm_model_name: str = "anthropic/claude-3.5-sonnet"
     langsmith_api_key: str = Field(
         default="",
         validation_alias=AliasChoices("LANGSMITH_API_KEY", "LANGCHAIN_API_KEY"),

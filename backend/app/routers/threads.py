@@ -1,5 +1,6 @@
 import json
 import logging
+from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -8,7 +9,7 @@ from app.auth.dependencies import get_current_user
 from app.db import threads as db
 from app.models.message import MessageCreate
 from app.models.thread import ThreadCreate, ThreadResponse
-from app.services import openai_service
+from app.services import completions_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -19,7 +20,7 @@ async def create_thread(
     body: ThreadCreate,
     user: dict = Depends(get_current_user),
 ):
-    openai_thread_id = await openai_service.create_openai_thread()
+    openai_thread_id = str(uuid4())
     thread = db.create_thread(
         user_id=user["id"],
         access_token=user["access_token"],
@@ -75,9 +76,8 @@ async def send_message(
     async def event_stream():
         full_response = []
         try:
-            async for token in openai_service.stream_assistant_response(
+            async for token in completions_service.stream_chat_completion(
                 message_history=message_history,
-                user_message=body.content,
                 user_id=user["id"],
                 thread_id=thread_id,
             ):

@@ -1,13 +1,14 @@
 # Agentic RAG Masterclass App
 
-This repository contains a full-stack RAG chat application built during Module 1 of the Agentic RAG Masterclass.
+This repository contains a full-stack RAG chat application built during the Agentic RAG Masterclass.
 
 Current implementation includes:
 - FastAPI backend with auth-protected thread and message routes
 - React + Vite frontend with Supabase auth flow and protected routes
 - Supabase-backed threads and messages schema with Row-Level Security policies
-- Azure OpenAI integration with streaming responses over SSE
-- LangSmith tracing hooks in the backend OpenAI service
+- Provider-agnostic Chat Completions API (OpenRouter, Ollama, LM Studio, Azure OpenAI)
+- Streaming chat responses over SSE
+- LangSmith tracing hooks in the backend completions service
 - Playwright-based end-to-end smoke validation script
 
 ## Tech Stack
@@ -17,7 +18,7 @@ Current implementation includes:
 | Frontend | React, TypeScript, Vite, Tailwind, shadcn/ui |
 | Backend | Python, FastAPI, Uvicorn |
 | Database/Auth | Supabase |
-| LLM | Azure OpenAI |
+| LLM | OpenAI-compatible providers (OpenRouter, Ollama, LM Studio, Azure OpenAI) |
 | Observability | LangSmith |
 | E2E Testing | Playwright |
 
@@ -63,15 +64,18 @@ Required variables:
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `AZURE_OPENAI_ENDPOINT`
-- `AZURE_OPENAI_API_KEY`
-- `AZURE_OPENAI_DEPLOYMENT_NAME`
-- `LANGCHAIN_API_KEY` (optional if tracing disabled)
-- `LANGCHAIN_PROJECT`
-- `LANGCHAIN_TRACING_V2`
+- `LLM_PROVIDER` (openrouter, ollama, openai-compat, or azure) 
+- `LLM_API_ENDPOINT`
+- `LLM_API_KEY`
+- `LLM_MODEL_NAME`
+- `LANGSMITH_API_KEY` (optional if tracing disabled)
+- `LANGSMITH_PROJECT`
+- `LANGSMITH_TRACING_ENABLED`
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_API_URL`
+
+See [PROVIDER_SETUP.md](PROVIDER_SETUP.md) for detailed LLM provider configuration (OpenRouter, Ollama, LM Studio, Azure)
 
 ## Setup
 
@@ -107,8 +111,18 @@ Or apply manually via the Supabase SQL editor:
 
 ## Run Locally
 
-Start backend:
+Use the provided startup script from the repo root:
 
+```bash
+scripts/start-services.sh start    # Start both backend and frontend
+scripts/start-services.sh restart  # Clean restart
+scripts/start-services.sh status   # Check service health and ports
+scripts/start-services.sh logs     # Tail recent logs
+```
+
+Or manually:
+
+Start backend:
 ```bash
 cd backend
 source venv/bin/activate
@@ -116,7 +130,6 @@ uvicorn app.main:app --reload
 ```
 
 Start frontend:
-
 ```bash
 cd frontend
 npm run dev
@@ -137,13 +150,33 @@ npm run build
 npm run lint
 ```
 
-### End-to-end smoke test
+### End-to-end smoke test (auth + protected routes)
 
 ```bash
 node e2e/module1.mjs
 ```
 
-The smoke test validates:
+### End-to-end authenticated chat test
+
+```bash
+TEST_EMAIL="test@test.com" TEST_PASSWORD='$1MhDupRhDqzqGY' node e2e/module1-auth-chat.mjs
+```
+
+The chat e2e test validates:
+- password sign-in (magic-link also supported)
+- thread creation
+- message streaming from configured LLM provider
+- assistant response generation
+
+**Note:** Requires a valid LLM provider key (see [PROVIDER_SETUP.md](PROVIDER_SETUP.md))
+
+### Smoke test validations
+
+```bash
+node e2e/module1.mjs
+```
+
+Validates:
 - unauthenticated redirect to `/login`
 - login page render
 - protected route guard behavior
