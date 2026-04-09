@@ -42,3 +42,6 @@ Track your progress through the masterclass. Update this file as you complete mo
 - [x] Added authenticated Playwright script `e2e/module1-auth-chat.mjs` covering OTP request, magic-link completion hook, and chat create/send assertions
 - [x] End-to-end chat flow tested (thread create → message → SSE stream) — automated via `e2e/module1-auth-chat.mjs`
 - [x] LangSmith trace verification confirmed — `create_openai_thread` and `stream_assistant_response` runs visible in `agentic-rag-masterclass` project with `success` status
+
+### Releases
+- [x] `0.0.1` cut on 2026-04-09 for completed Module 1 scope
