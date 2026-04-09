@@ -53,7 +53,7 @@ Technically-minded people who want to build production RAG systems using AI codi
 | Frontend | React + TypeScript + Vite + Tailwind + shadcn/ui |
 | Backend | Python + FastAPI |
 | Database | Supabase (Postgres + pgvector + Auth + Storage + Realtime) |
-| LLM (Module 1) | Azure OpenAI Responses API (managed threads + file_search) |
+| LLM (Module 1) | Azure AI Projects + OpenAI Responses API (managed memory + optional file_search vector store) |
 | LLM (Module 2+) | Any Azure OpenAI-compatible endpoint (OpenRouter, Ollama, LM Studio, etc.) |
 | Observability | LangSmith |
 
@@ -68,11 +68,11 @@ Technically-minded people who want to build production RAG systems using AI codi
 
 ## Module 1: The App Shell + Observability
 
-**Build:** Auth, chat UI, Azure OpenAI Responses API (manages threads + file_search), LangSmith tracing
+**Build:** Auth (password + magic link), chat UI, Azure OpenAI Responses API (managed memory + optional file_search vector store), LangSmith tracing
 
 **Learn:** What RAG is, why managed RAG exists, its limitations (Azure OpenAI handles memory and retrieval - black box)
 
-**Note:** The Responses API is Azure OpenAI-specific. It provides managed threads and built-in file search, but locks you into Azure OpenAI. Module 2 transitions to the standard Chat Completions API for provider flexibility.
+**Note:** The Responses API is Azure OpenAI-specific. It provides managed memory and built-in tools (including file_search when a vector store is configured), but locks you into Azure OpenAI. Module 2 transitions to the standard Chat Completions API for provider flexibility.
 
 ---
 
