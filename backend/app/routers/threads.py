@@ -1,4 +1,5 @@
 import json
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -10,6 +11,7 @@ from app.models.thread import ThreadCreate, ThreadResponse
 from app.services import openai_service
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/threads", response_model=ThreadResponse)
@@ -65,24 +67,34 @@ async def send_message(
         content=body.content,
     )
 
+    message_history = sorted(
+        [*(thread.get("messages") or []), {"role": "user", "content": body.content}],
+        key=lambda message: message.get("created_at", ""),
+    )
+
     async def event_stream():
         full_response = []
-        async for token in openai_service.stream_assistant_response(
-            openai_thread_id=thread["openai_thread_id"],
-            user_message=body.content,
-            user_id=user["id"],
-            thread_id=thread_id,
-        ):
-            full_response.append(token)
-            yield f"data: {json.dumps({'token': token})}\n\n"
+        try:
+            async for token in openai_service.stream_assistant_response(
+                message_history=message_history,
+                user_message=body.content,
+                user_id=user["id"],
+                thread_id=thread_id,
+            ):
+                full_response.append(token)
+                yield f"data: {json.dumps({'token': token})}\n\n"
 
-        assistant_content = "".join(full_response)
-        db.add_message(
-            access_token=user["access_token"],
-            thread_id=thread_id,
-            role="assistant",
-            content=assistant_content,
-        )
-        yield "data: [DONE]\n\n"
+            assistant_content = "".join(full_response)
+            db.add_message(
+                access_token=user["access_token"],
+                thread_id=thread_id,
+                role="assistant",
+                content=assistant_content,
+            )
+        except Exception:
+            logger.exception("Failed while streaming assistant response")
+            yield f"data: {json.dumps({'error': 'Assistant stream failed'})}\n\n"
+        finally:
+            yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

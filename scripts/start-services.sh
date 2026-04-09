@@ -63,10 +63,14 @@ start_backend() {
     exit 1
   fi
 
+  # Create cache directory
+  mkdir -p "$RUN_DIR/cache"
+
   echo "[info] Starting backend..."
   (
     cd "$BACKEND_DIR"
     source venv/bin/activate
+    export PYTHONPYCACHEPREFIX="$RUN_DIR/cache"
     nohup uvicorn app.main:app --reload --host 127.0.0.1 --port "$backend_port" >"$LOG_DIR/backend.log" 2>&1 &
     echo $! >"$BACKEND_PID_FILE"
   )

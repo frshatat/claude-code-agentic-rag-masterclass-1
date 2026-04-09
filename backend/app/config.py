@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     azure_openai_api_key: str
     azure_openai_deployment_name: str = "gpt-4o-mini"
     azure_openai_api_version: str = "2024-08-01-preview"
+    openai_vector_store_id: str = ""
     langsmith_api_key: str = Field(
         default="",
         validation_alias=AliasChoices("LANGSMITH_API_KEY", "LANGCHAIN_API_KEY"),
