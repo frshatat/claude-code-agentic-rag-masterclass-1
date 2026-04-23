@@ -1,0 +1,118 @@
+{
+  "version": "1.0.0",
+  "updated_on": "2026-04-22",
+  "layers": {
+    "A": {
+      "name": "Smoke",
+      "commands": [
+        "node e2e/module1.mjs"
+      ]
+    },
+    "B": {
+      "name": "Backend Unit",
+      "commands": [
+        "cd backend && source venv/bin/activate && python -m pytest tests/unit"
+      ]
+    },
+    "C": {
+      "name": "Backend Integration",
+      "commands": [
+        "cd backend && source venv/bin/activate && python -m pytest tests/integration"
+      ]
+    },
+    "D": {
+      "name": "Browser E2E",
+      "commands": [
+        "TEST_EMAIL=... TEST_PASSWORD=... node e2e/module1-auth-chat.mjs"
+      ]
+    },
+    "E": {
+      "name": "Release Gate",
+      "commands": [
+        "./scripts/validate.sh fast",
+        "./scripts/validate.sh full"
+      ]
+    }
+  },
+  "features": [
+    {
+      "feature": "Module 1 auth and app shell",
+      "status": "implemented",
+      "acceptance": [
+        "Unauthenticated root redirects to /login",
+        "Password sign-in succeeds with test credentials",
+        "Protected routes reject missing auth"
+      ],
+      "tests": [
+        "e2e/module1.mjs",
+        "e2e/module1-auth-chat.mjs",
+        "backend/tests/integration/test_api_contract.py"
+      ]
+    },
+    {
+      "feature": "Chat threads and streaming",
+      "status": "implemented",
+      "acceptance": [
+        "User can create thread and send message",
+        "Assistant stream returns non-empty output",
+        "User isolation for thread/message access"
+      ],
+      "tests": [
+        "e2e/module1-auth-chat.mjs",
+        "backend/tests/unit/test_completions_service.py",
+        "backend/tests/integration/test_rls_isolation.py"
+      ]
+    },
+    {
+      "feature": "Provider-agnostic completions",
+      "status": "implemented",
+      "acceptance": [
+        "Message payload is filtered to valid roles",
+        "Runtime settings are applied to completion client",
+        "Streaming failures surface as exceptions"
+      ],
+      "tests": [
+        "backend/tests/unit/test_completions_service.py",
+        "backend/tests/unit/test_user_runtime_settings_service.py",
+        "backend/tests/integration/test_api_contract.py"
+      ]
+    },
+    {
+      "feature": "Ingestion foundation",
+      "status": "implemented",
+      "acceptance": [
+        "Document rows are user-isolated by RLS",
+        "Unsupported/deferred realtime ingestion tests are explicitly marked pending"
+      ],
+      "tests": [
+        "backend/tests/integration/test_rls_isolation.py",
+        "backend/tests/integration/test_pending_deferred_features.py"
+      ]
+    },
+    {
+      "feature": "Phase 7 completed subset",
+      "status": "partially-implemented",
+      "acceptance": [
+        "Chunking enforces overlap and sequence",
+        "Embedding service resolves user runtime settings",
+        "Secret crypto encrypt/decrypt round-trips"
+      ],
+      "tests": [
+        "backend/tests/unit/test_chunking_service.py",
+        "backend/tests/unit/test_embedding_service.py",
+        "backend/tests/unit/test_secret_crypto_service.py",
+        "backend/tests/unit/test_user_runtime_settings_service.py"
+      ]
+    },
+    {
+      "feature": "Deferred features",
+      "status": "deferred",
+      "acceptance": [
+        "Pending coverage is visible in test output"
+      ],
+      "tests": [
+        "backend/tests/integration/test_pending_deferred_features.py"
+      ]
+    }
+  ]
+}

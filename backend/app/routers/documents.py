@@ -89,7 +89,7 @@ async def upload_document(
         
         # Mark as uploaded (chunking happens async in Phase 7)
         supabase.table("documents").update(
-            {"status": "processing"}
+            {"status": "complete"}
         ).eq("id", doc_id).execute()
         
         logger.info(f"Document uploaded: {doc_id} by user {user['id']}")
@@ -98,8 +98,8 @@ async def upload_document(
             "document_id": doc_id,
             "file_name": file.filename,
             "file_size": len(content),
-            "status": "processing",
-            "message": "File uploaded. Processing started.",
+            "status": "complete",
+            "message": "File uploaded successfully.",
         }
     
     except Exception as e:

@@ -14,6 +14,17 @@ supabase.auth.onAuthStateChange((_event, session) => {
   _accessToken = session?.access_token ?? null
 })
 
+void supabase.auth.getSession().then(({ data }) => {
+  _accessToken = data.session?.access_token ?? null
+})
+
 export function getAccessToken(): string | null {
+  return _accessToken
+}
+
+export async function getAccessTokenAsync(): Promise<string | null> {
+  if (_accessToken) return _accessToken
+  const { data } = await supabase.auth.getSession()
+  _accessToken = data.session?.access_token ?? null
   return _accessToken
 }

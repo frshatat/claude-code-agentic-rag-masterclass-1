@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import health, threads, documents
+from app.routers import health, threads, documents, models, settings
 from app.db.migrations import init_schema
 
 app = FastAPI(title="Agentic RAG API", version="1.0.0")
@@ -13,7 +13,7 @@ async def startup_event():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,3 +22,5 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(threads.router, prefix="/api")
 app.include_router(documents.router, prefix="/api")
+app.include_router(models.router, prefix="/api")
+app.include_router(settings.router, prefix="/api")

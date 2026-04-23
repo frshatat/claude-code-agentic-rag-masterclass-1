@@ -78,6 +78,7 @@ async def send_message(
         try:
             async for token in completions_service.stream_chat_completion(
                 message_history=message_history,
+                access_token=user["access_token"],
                 user_id=user["id"],
                 thread_id=thread_id,
             ):

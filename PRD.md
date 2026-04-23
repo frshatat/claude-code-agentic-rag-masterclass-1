@@ -99,7 +99,7 @@ There is no right answer—this is a real architectural choice you'll face in bu
 
 **Prerequisites:** Complete the architectural decision above.
 
-**Build:** Ingestion UI, file storage, chunking → embedding → pgvector, retrieval tool, Chat Completions API integration (OpenRouter/Ollama/LM Studio), chat history storage (stateless API - you manage memory now), realtime ingestion status
+**Build:** Ingestion UI, file storage, chunking → embedding → pgvector, retrieval tool, providing selector for model provider, Chat Completions API integration (OpenRouter/Ollama/LM Studio), chat history storage (stateless API - you manage memory now), realtime ingestion status
 
 **Learn:** Chunking, embeddings, vector search, tool calling, relevance thresholds, managing conversation history, **steering AI agents through architectural refactoring**
 

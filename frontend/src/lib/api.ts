@@ -1,8 +1,28 @@
 const API_URL = import.meta.env.VITE_API_URL ?? ''
 
+export interface UserModelSettingsResponse {
+  llm_model_name: string
+  llm_base_url: string
+  llm_api_key_set: boolean
+  embedding_model_name: string
+  embedding_base_url: string
+  embedding_api_key_set: boolean
+  embedding_dimensions: number
+}
+
+export interface UserModelSettingsUpdate {
+  llm_model_name: string
+  llm_base_url: string
+  llm_api_key?: string
+  embedding_model_name: string
+  embedding_base_url: string
+  embedding_api_key?: string
+  embedding_dimensions: number
+}
+
 async function authHeaders(): Promise<Record<string, string>> {
-  const { getAccessToken } = await import('./supabase')
-  const token = getAccessToken()
+  const { getAccessTokenAsync } = await import('./supabase')
+  const token = await getAccessTokenAsync()
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
@@ -84,4 +104,25 @@ export async function sendMessage(
       }
     }
   }
+}
+
+export async function getUserModelSettings(): Promise<UserModelSettingsResponse> {
+  const res = await fetch(`${API_URL}/api/settings/model-config`, {
+    headers: await authHeaders(),
+  })
+  if (!res.ok) throw new Error('Failed to fetch user settings')
+  return res.json()
+}
+
+export async function updateUserModelSettings(body: UserModelSettingsUpdate) {
+  const res = await fetch(`${API_URL}/api/settings/model-config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const payload = await res.json().catch(() => ({}))
+    throw new Error(payload.detail ?? 'Failed to save user settings')
+  }
+  return res.json()
 }

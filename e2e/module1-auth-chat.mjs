@@ -55,10 +55,18 @@ import pkg from '/Users/farisshatat/.nvm/versions/node/v24.14.0/lib/node_modules
 const { chromium } = pkg;
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
+const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL ?? 'http://127.0.0.1:8000';
 const TEST_EMAIL = process.env.TEST_EMAIL ?? '';
 const TEST_PASSWORD = process.env.TEST_PASSWORD ?? '';
 const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? '';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY ?? '';
+const LLM_API_ENDPOINT = process.env.LLM_API_ENDPOINT ?? '';
+const LLM_API_KEY = process.env.LLM_API_KEY ?? '';
+const LLM_MODEL_NAME = process.env.LLM_MODEL_NAME ?? 'openai/gpt-3.5-turbo';
+const EMBEDDING_API_ENDPOINT = process.env.EMBEDDING_API_ENDPOINT ?? LLM_API_ENDPOINT;
+const EMBEDDING_API_KEY = process.env.EMBEDDING_API_KEY ?? LLM_API_KEY;
+const EMBEDDING_MODEL_NAME = process.env.EMBEDDING_MODEL_NAME ?? 'text-embedding-3-small';
+const EMBEDDING_DIMENSIONS = Number.parseInt(process.env.EMBEDDING_DIMENSIONS ?? '1536', 10);
 
 let passed = 0;
 let failed = 0;
@@ -83,8 +91,10 @@ assert(Boolean(TEST_EMAIL), 'TEST_EMAIL is set', 'export TEST_EMAIL=test@test.co
 assert(Boolean(TEST_PASSWORD), 'TEST_PASSWORD is set', "export TEST_PASSWORD='...'");
 assert(Boolean(SUPABASE_URL), 'SUPABASE_URL resolved');
 assert(Boolean(SUPABASE_ANON_KEY), 'SUPABASE_ANON_KEY resolved');
+assert(Boolean(LLM_API_ENDPOINT), 'LLM_API_ENDPOINT resolved from env');
+assert(Boolean(LLM_API_KEY), 'LLM_API_KEY resolved from env');
 
-if (!TEST_EMAIL || !TEST_PASSWORD || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+if (!TEST_EMAIL || !TEST_PASSWORD || !SUPABASE_URL || !SUPABASE_ANON_KEY || !LLM_API_ENDPOINT || !LLM_API_KEY) {
   console.error('\nFatal: missing required env vars. Aborting.');
   process.exit(1);
 }
@@ -108,6 +118,35 @@ if (!restOk) {
   console.error('\nFatal: invalid credentials. Aborting.');
   process.exit(1);
 }
+
+// ---------------------------------------------------------------------------
+// Phase 1b: Ensure model settings exist for this user (required for chat stream)
+// ---------------------------------------------------------------------------
+console.log('\n── Phase 1b: Seed model settings for test account ─────────────────────');
+
+const settingsResp = await fetch(`${BACKEND_BASE_URL}/api/settings/model-config`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${tokenBody.access_token}`,
+  },
+  body: JSON.stringify({
+    llm_model_name: LLM_MODEL_NAME,
+    llm_base_url: LLM_API_ENDPOINT,
+    llm_api_key: LLM_API_KEY,
+    embedding_model_name: EMBEDDING_MODEL_NAME,
+    embedding_base_url: EMBEDDING_API_ENDPOINT,
+    embedding_api_key: EMBEDDING_API_KEY,
+    embedding_dimensions: EMBEDDING_DIMENSIONS,
+  }),
+});
+
+const settingsBody = await settingsResp.json().catch(() => null);
+assert(
+  settingsResp.ok,
+  `Model settings seed succeeded (${settingsResp.status})`,
+  settingsBody ? JSON.stringify(settingsBody).slice(0, 300) : undefined,
+);
 
 // ---------------------------------------------------------------------------
 // Phase 2: Browser — sign in via password UI

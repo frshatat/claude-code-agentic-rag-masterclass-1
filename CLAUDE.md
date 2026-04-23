@@ -19,6 +19,7 @@ RAG app with chat (default) and document ingestion interfaces. Config via env va
 - Module 2+ uses stateless completions - store and send chat history yourself
 - Ingestion is manual file upload only - no connectors or automated pipelines
 - Login UX supports both password and magic-link sign in; keep both paths working unless explicitly changed
+- Validation maintenance is mandatory: every feature/behavior change must include a test-suite update in at least one applicable layer (`backend/tests/unit`, `backend/tests/integration`, `e2e`) and must keep `validation/manifest.json` acceptance mapping current
 
 ## Critical Build Dependencies
 - Service launcher expects backend env at `backend/.env` and frontend env at `frontend/.env`
@@ -43,6 +44,15 @@ RAG app with chat (default) and document ingestion interfaces. Config via env va
 2. **Build** - Execute the plan to implement the feature
 3. **Validate** - Test and verify the implementation works correctly. Use browser testing where applicable via an appropriate MCP
 4. **Iterate** - Fix any issues found during validation
+
+## Validation Policy (For Future Agents)
+- Any behavior change is incomplete unless the validation suite grows with it.
+- Required after code changes:
+  - Update or add tests in at least one matching layer (smoke, unit, integration, e2e)
+  - Update `validation/manifest.json` when feature coverage or acceptance criteria changes
+  - Run `./scripts/validate.sh fast` during development
+  - Run `./scripts/validate.sh full` before handoff/release
+- Do not silently skip deferred scope. Keep pending tests explicit (for example xfail with a clear reason).
 
 ## Service Spin-Up (For Future Agents)
 - Start both backend and frontend from repo root with:
